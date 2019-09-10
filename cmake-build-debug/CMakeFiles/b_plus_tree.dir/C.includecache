@@ -1,0 +1,28 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/cygdrive/d/CLionProjects/b-plus-tree/h/BPlusTree.h
+stdio.h
+-
+stdlib.h
+-
+limits.h
+-
+
+/cygdrive/d/CLionProjects/b-plus-tree/src/BPlusTree.c
+../h/BPlusTree.h
+/cygdrive/d/CLionProjects/b-plus-tree/h/BPlusTree.h
+
+/cygdrive/d/CLionProjects/b-plus-tree/src/main.c
+stdio.h
+-
+time.h
+-
+../h/BPlusTree.h
+/cygdrive/d/CLionProjects/b-plus-tree/h/BPlusTree.h
+
