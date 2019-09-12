@@ -57,18 +57,18 @@ include CMakeFiles/b_plus_tree.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/b_plus_tree.dir/flags.make
 
-CMakeFiles/b_plus_tree.dir/src/main.c.o: CMakeFiles/b_plus_tree.dir/flags.make
-CMakeFiles/b_plus_tree.dir/src/main.c.o: ../src/main.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/cygdrive/d/CLionProjects/b-plus-tree/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/b_plus_tree.dir/src/main.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/b_plus_tree.dir/src/main.c.o   -c /cygdrive/d/CLionProjects/b-plus-tree/src/main.c
+CMakeFiles/b_plus_tree.dir/main.c.o: CMakeFiles/b_plus_tree.dir/flags.make
+CMakeFiles/b_plus_tree.dir/main.c.o: ../main.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/cygdrive/d/CLionProjects/b-plus-tree/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/b_plus_tree.dir/main.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/b_plus_tree.dir/main.c.o   -c /cygdrive/d/CLionProjects/b-plus-tree/main.c
 
-CMakeFiles/b_plus_tree.dir/src/main.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/b_plus_tree.dir/src/main.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /cygdrive/d/CLionProjects/b-plus-tree/src/main.c > CMakeFiles/b_plus_tree.dir/src/main.c.i
+CMakeFiles/b_plus_tree.dir/main.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/b_plus_tree.dir/main.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /cygdrive/d/CLionProjects/b-plus-tree/main.c > CMakeFiles/b_plus_tree.dir/main.c.i
 
-CMakeFiles/b_plus_tree.dir/src/main.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/b_plus_tree.dir/src/main.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /cygdrive/d/CLionProjects/b-plus-tree/src/main.c -o CMakeFiles/b_plus_tree.dir/src/main.c.s
+CMakeFiles/b_plus_tree.dir/main.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/b_plus_tree.dir/main.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /cygdrive/d/CLionProjects/b-plus-tree/main.c -o CMakeFiles/b_plus_tree.dir/main.c.s
 
 CMakeFiles/b_plus_tree.dir/src/BPlusTree.c.o: CMakeFiles/b_plus_tree.dir/flags.make
 CMakeFiles/b_plus_tree.dir/src/BPlusTree.c.o: ../src/BPlusTree.c
@@ -85,13 +85,13 @@ CMakeFiles/b_plus_tree.dir/src/BPlusTree.c.s: cmake_force
 
 # Object files for target b_plus_tree
 b_plus_tree_OBJECTS = \
-"CMakeFiles/b_plus_tree.dir/src/main.c.o" \
+"CMakeFiles/b_plus_tree.dir/main.c.o" \
 "CMakeFiles/b_plus_tree.dir/src/BPlusTree.c.o"
 
 # External object files for target b_plus_tree
 b_plus_tree_EXTERNAL_OBJECTS =
 
-b_plus_tree.exe: CMakeFiles/b_plus_tree.dir/src/main.c.o
+b_plus_tree.exe: CMakeFiles/b_plus_tree.dir/main.c.o
 b_plus_tree.exe: CMakeFiles/b_plus_tree.dir/src/BPlusTree.c.o
 b_plus_tree.exe: CMakeFiles/b_plus_tree.dir/build.make
 b_plus_tree.exe: CMakeFiles/b_plus_tree.dir/link.txt

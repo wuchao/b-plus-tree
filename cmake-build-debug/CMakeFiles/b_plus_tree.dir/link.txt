@@ -1,1 +1,1 @@
-/usr/bin/cc -g  -Wl,--enable-auto-import CMakeFiles/b_plus_tree.dir/src/main.c.o CMakeFiles/b_plus_tree.dir/src/BPlusTree.c.o  -o b_plus_tree.exe -Wl,--out-implib,libb_plus_tree.dll.a -Wl,--major-image-version,0,--minor-image-version,0 
+/usr/bin/cc -g  -Wl,--enable-auto-import CMakeFiles/b_plus_tree.dir/main.c.o CMakeFiles/b_plus_tree.dir/src/BPlusTree.c.o  -o b_plus_tree.exe -Wl,--out-implib,libb_plus_tree.dll.a -Wl,--major-image-version,0,--minor-image-version,0 

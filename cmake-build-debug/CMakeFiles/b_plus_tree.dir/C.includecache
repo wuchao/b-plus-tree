@@ -18,11 +18,3 @@ limits.h
 ../h/BPlusTree.h
 /cygdrive/d/CLionProjects/b-plus-tree/h/BPlusTree.h
 
-/cygdrive/d/CLionProjects/b-plus-tree/src/main.c
-stdio.h
--
-time.h
--
-../h/BPlusTree.h
-/cygdrive/d/CLionProjects/b-plus-tree/h/BPlusTree.h
-

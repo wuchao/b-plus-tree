@@ -123,6 +123,33 @@ b_plus_tree/fast:
 	$(MAKE) -f CMakeFiles/b_plus_tree.dir/build.make CMakeFiles/b_plus_tree.dir/build
 .PHONY : b_plus_tree/fast
 
+main.o: main.c.o
+
+.PHONY : main.o
+
+# target to build an object file
+main.c.o:
+	$(MAKE) -f CMakeFiles/b_plus_tree.dir/build.make CMakeFiles/b_plus_tree.dir/main.c.o
+.PHONY : main.c.o
+
+main.i: main.c.i
+
+.PHONY : main.i
+
+# target to preprocess a source file
+main.c.i:
+	$(MAKE) -f CMakeFiles/b_plus_tree.dir/build.make CMakeFiles/b_plus_tree.dir/main.c.i
+.PHONY : main.c.i
+
+main.s: main.c.s
+
+.PHONY : main.s
+
+# target to generate assembly for a file
+main.c.s:
+	$(MAKE) -f CMakeFiles/b_plus_tree.dir/build.make CMakeFiles/b_plus_tree.dir/main.c.s
+.PHONY : main.c.s
+
 src/BPlusTree.o: src/BPlusTree.c.o
 
 .PHONY : src/BPlusTree.o
@@ -150,33 +177,6 @@ src/BPlusTree.c.s:
 	$(MAKE) -f CMakeFiles/b_plus_tree.dir/build.make CMakeFiles/b_plus_tree.dir/src/BPlusTree.c.s
 .PHONY : src/BPlusTree.c.s
 
-src/main.o: src/main.c.o
-
-.PHONY : src/main.o
-
-# target to build an object file
-src/main.c.o:
-	$(MAKE) -f CMakeFiles/b_plus_tree.dir/build.make CMakeFiles/b_plus_tree.dir/src/main.c.o
-.PHONY : src/main.c.o
-
-src/main.i: src/main.c.i
-
-.PHONY : src/main.i
-
-# target to preprocess a source file
-src/main.c.i:
-	$(MAKE) -f CMakeFiles/b_plus_tree.dir/build.make CMakeFiles/b_plus_tree.dir/src/main.c.i
-.PHONY : src/main.c.i
-
-src/main.s: src/main.c.s
-
-.PHONY : src/main.s
-
-# target to generate assembly for a file
-src/main.c.s:
-	$(MAKE) -f CMakeFiles/b_plus_tree.dir/build.make CMakeFiles/b_plus_tree.dir/src/main.c.s
-.PHONY : src/main.c.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -186,12 +186,12 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... b_plus_tree"
 	@echo "... edit_cache"
+	@echo "... main.o"
+	@echo "... main.i"
+	@echo "... main.s"
 	@echo "... src/BPlusTree.o"
 	@echo "... src/BPlusTree.i"
 	@echo "... src/BPlusTree.s"
-	@echo "... src/main.o"
-	@echo "... src/main.i"
-	@echo "... src/main.s"
 .PHONY : help
 
 

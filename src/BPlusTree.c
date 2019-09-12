@@ -123,8 +123,8 @@ static BPlusTree find_sibling_key_num_greater_than_M_2(BPlusTree Parent, int i, 
 }
 
 /**
- * 当要对 X 插入 key 的时候，i 是 X 在 Parent 的位置，j 是 key 要插入的位置
-   当要对 Parent 插入 X 节点的时候，i 是要插入的位置，key 和 j 的值没有用
+ * 当要对 X 插入 key 的时候，i 是 X 在 Parent 的位置，j 是 key 要插入到 X 的位置，
+ * 当要对 Parent 插入 X 节点的时候，i 是要插入的位置，key 和 j 的值没有用
  * @param isKey
  * @param Parent
  * @param X
@@ -138,6 +138,7 @@ static BPlusTree insert_element(int isKey, BPlusTree Parent, BPlusTree X, KeyTyp
 
     if (isKey) {
         /* 插入 key */
+        /* 将 key 插入 X->keys[j] 位置 */
 
         k = X->keyNum - 1;
         while (k >= j) {
@@ -156,7 +157,7 @@ static BPlusTree insert_element(int isKey, BPlusTree Parent, BPlusTree X, KeyTyp
     } else {
         /* 插入节点 */
 
-        /* 对树叶节点进行连接 */
+        /* 树叶节点之间用指针按照从小到大的顺序串行链接 */
         if (X->children[0] == NULL) {
             if (i > 0) {
                 Parent->children[i - 1]->next = X;
@@ -164,6 +165,7 @@ static BPlusTree insert_element(int isKey, BPlusTree Parent, BPlusTree X, KeyTyp
             X->next = Parent->children[i];
         }
 
+        /* 将新节点插入到 Parent->children[i] 位置 */
         k = Parent->keyNum - 1;
         while (k >= i) {
             Parent->children[k + 1] = Parent->children[k];
@@ -174,7 +176,6 @@ static BPlusTree insert_element(int isKey, BPlusTree Parent, BPlusTree X, KeyTyp
         Parent->children[i] = X;
 
         Parent->keyNum++;
-
     }
 
     return X;
@@ -224,7 +225,7 @@ static BPlusTree remove_element(int isKey, BPlusTree Parent, BPlusTree X, int i,
 
 /* Src和Dst是两个相邻的节点，i是Src在Parent中的位置；
  将Src的元素移动到Dst中 ,n是移动元素的个数*/
-static BPlusTree MoveElement(BPlusTree Src, BPlusTree Dst, BPlusTree Parent, int i, int n) {
+static BPlusTree move_element(BPlusTree Src, BPlusTree Dst, BPlusTree Parent, int i, int n) {
     KeyType TmpKey;
     BPlusTree Child;
     int j, SrcInFront;
@@ -287,35 +288,43 @@ static BPlusTree MoveElement(BPlusTree Src, BPlusTree Dst, BPlusTree Parent, int
     return Parent;
 }
 
+/**
+ * 分裂节点
+ * @param Parent
+ * @param X
+ * @param i
+ * @return
+ */
 static BPlusTree split_node(BPlusTree Parent, BPlusTree X, int i) {
-    int j, k, Limit;
-    BPlusTree NewNode;
+    int j = X->keyNum / 2, k = 0, Limit = X->keyNum;
+    BPlusTree newNode = b_malloc_node();
 
-    NewNode = b_malloc_node();
-
-    k = 0;
-    j = X->keyNum / 2;
-    Limit = X->keyNum;
+    /* 节点拆分过程 */
     while (j < Limit) {
         if (X->children[0] != NULL) {
-            NewNode->children[k] = X->children[j];
+            newNode->children[k] = X->children[j];
             X->children[j] = NULL;
         }
-        NewNode->keys[k] = X->keys[j];
+
+        newNode->keys[k] = X->keys[j];
         X->keys[j] = UNAVAILABLE;
-        NewNode->keyNum++;
+
+        newNode->keyNum++;
         X->keyNum--;
+
         j++;
         k++;
     }
 
-    if (Parent != NULL)
-        insert_element(0, Parent, NewNode, UNAVAILABLE, i + 1, UNAVAILABLE);
-    else {
-        /* 如果是X是根，那么创建新的根并返回 */
+    if (Parent != NULL) {
+        // 将分裂出来的节点放到父节点下（插入节点时，key 的值和 key 要插入的位置无用）
+        insert_element(0, Parent, newNode, UNAVAILABLE, i + 1, UNAVAILABLE);
+    } else {
+        /* 如果 X 原来是根，那么拆分后要创建新的根，并将拆分后的两个节点都放到新的根下 */
         Parent = b_malloc_node();
+
         insert_element(0, Parent, X, UNAVAILABLE, 0, UNAVAILABLE);
-        insert_element(0, Parent, NewNode, UNAVAILABLE, 1, UNAVAILABLE);
+        insert_element(0, Parent, newNode, UNAVAILABLE, 1, UNAVAILABLE);
 
         return Parent;
     }
@@ -323,18 +332,18 @@ static BPlusTree split_node(BPlusTree Parent, BPlusTree X, int i) {
     return X;
 }
 
-/* 合并节点,X少于M/2关键字，S有大于或等于M/2个关键字*/
-static BPlusTree MergeNode(BPlusTree Parent, BPlusTree X, BPlusTree S, int i) {
+/* 合并节点，X 少于 M/2 关键字，S 有大于或等于 M/2 个关键字 */
+static BPlusTree merge_node(BPlusTree Parent, BPlusTree X, BPlusTree S, int i) {
     int Limit;
 
-    /* S的关键字数目大于M/2 */
+    /* S 的关键字数目大于 M/2 */
     if (S->keyNum > LIMIT_M_2) {
-        /* 从S中移动一个元素到X中 */
-        MoveElement(S, X, Parent, i, 1);
+        /* 从 S 中移动一个元素到 X 中 */
+        move_element(S, X, Parent, i, 1);
     } else {
-        /* 将X全部元素移动到S中，并把X删除 */
+        /* 将 X 全部元素移动到 S 中，并把 X 删除 */
         Limit = X->keyNum;
-        MoveElement(X, S, Parent, i, Limit);
+        move_element(X, S, Parent, i, Limit);
         remove_element(0, Parent, X, i, UNAVAILABLE);
 
         free(X);
@@ -353,10 +362,8 @@ static BPlusTree MergeNode(BPlusTree Parent, BPlusTree X, BPlusTree S, int i) {
  * @return
  */
 static BPlusTree insert_recursively(BPlusTree T, KeyType key, int i, BPlusTree Parent) {
-    BPlusTree Sibling;
     int j = 0, Limit = M;
 
-    /* 查找分支 */
     while (j < T->keyNum && key >= T->keys[j]) {
         /* 重复值不插入 */
         if (key == T->keys[j]) {
@@ -377,15 +384,15 @@ static BPlusTree insert_recursively(BPlusTree T, KeyType key, int i, BPlusTree P
 
     /* 调整节点 */
     if (T->keyNum > Limit) {
-        /* 根 */
+
         if (Parent == NULL) {
             /* 分裂节点 */
             T = split_node(Parent, T, i);
         } else {
-            Sibling = find_available_sibling(Parent, i);
+            BPlusTree Sibling = find_available_sibling(Parent, i);
             if (Sibling != NULL) {
-                /* 将T的一个元素（Key或者Child）移动的Sibing中 */
-                MoveElement(T, Sibling, Parent, i, 1);
+                /* 将 T 的一个元素（key 或者 children）移动到 Sibling 中 */
+                move_element(T, Sibling, Parent, i, 1);
             } else {
                 /* 分裂节点 */
                 T = split_node(Parent, T, i);
@@ -394,9 +401,9 @@ static BPlusTree insert_recursively(BPlusTree T, KeyType key, int i, BPlusTree P
 
     }
 
-    if (Parent != NULL)
+    if (Parent != NULL) {
         Parent->keys[i] = T->keys[0];
-
+    }
 
     return T;
 }
@@ -467,14 +474,14 @@ static BPlusTree remove_recursively(BPlusTree T, KeyType Key, int i, BPlusTree P
             /* 查找兄弟节点，其关键字数目大于M/2 */
             Sibling = find_sibling_key_num_greater_than_M_2(Parent, i, &j);
             if (Sibling != NULL) {
-                MoveElement(Sibling, T, Parent, j, 1);
+                move_element(Sibling, T, Parent, j, 1);
             } else {
                 if (i == 0)
                     Sibling = Parent->children[1];
                 else
                     Sibling = Parent->children[i - 1];
 
-                Parent = MergeNode(Parent, T, Sibling, i);
+                Parent = merge_node(Parent, T, Sibling, i);
                 T = Parent->children[i];
             }
         }

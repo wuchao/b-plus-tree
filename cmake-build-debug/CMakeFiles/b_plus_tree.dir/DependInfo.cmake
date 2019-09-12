@@ -4,8 +4,8 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
+  "/cygdrive/d/CLionProjects/b-plus-tree/main.c" "/cygdrive/d/CLionProjects/b-plus-tree/cmake-build-debug/CMakeFiles/b_plus_tree.dir/main.c.o"
   "/cygdrive/d/CLionProjects/b-plus-tree/src/BPlusTree.c" "/cygdrive/d/CLionProjects/b-plus-tree/cmake-build-debug/CMakeFiles/b_plus_tree.dir/src/BPlusTree.c.o"
-  "/cygdrive/d/CLionProjects/b-plus-tree/src/main.c" "/cygdrive/d/CLionProjects/b-plus-tree/cmake-build-debug/CMakeFiles/b_plus_tree.dir/src/main.c.o"
   )
 set(CMAKE_C_COMPILER_ID "GNU")
 

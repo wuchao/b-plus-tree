@@ -1,5 +1,5 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/b_plus_tree.dir/src/main.c.o"
+  "CMakeFiles/b_plus_tree.dir/main.c.o"
   "CMakeFiles/b_plus_tree.dir/src/BPlusTree.c.o"
   "b_plus_tree.pdb"
   "b_plus_tree.exe"
