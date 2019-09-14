@@ -629,19 +629,21 @@ extern void b_travel_data(BPlusTree T) {
  * @return
  */
 extern BPlusTree b_find(BPlusTree T, KeyType key) {
-    if (T->children[0] == NULL) {
-        BPlusTree tmp = NULL;
-        for (int i = 0; i < T->keyNum; ++i) {
-            if (T->keys[i] == key) {
-                tmp = T;
-                break;
+    if (T != NULL) {
+        if (T->children[0] == NULL) {
+            BPlusTree tmp = NULL;
+            for (int i = 0; i < T->keyNum; ++i) {
+                if (T->keys[i] == key) {
+                    tmp = T;
+                    break;
+                }
             }
-        }
-        return tmp;
-    } else {
-        for (int i = T->keyNum - 1; i >= 0; ++i) {
-            if (key >= T->keys[i]) {
-                return b_find(T->children[i], key);
+            return tmp;
+        } else {
+            for (int i = T->keyNum - 1; i >= 0; --i) {
+                if (key >= T->keys[i]) {
+                    return b_find(T->children[i], key);
+                }
             }
         }
     }

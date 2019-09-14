@@ -20,13 +20,19 @@ int main() {
     b_travel(T);
 
     // 查找指定 key 所在叶子节点
-    KeyType key = 91;
+    KeyType key = 44;
     BPlusTree P = b_find(T, key);
     if (P != NULL) {
-        printf("\n\nkey: %d 所在叶子节点信息为：", key);
-        for (int j = 0; j < P->keyNum; ++j) {
-            printf("%d", P->keys[j]);
-            if (j < P->keyNum - 1) {
+        printf("\n\nkey: %d 所在叶子节点以及与叶子节点链接的节点信息为：", key);
+        while (P != NULL) {
+            for (int j = 0; j < P->keyNum; ++j) {
+                printf("%d", P->keys[j]);
+                if (j < P->keyNum - 1) {
+                    printf(",");
+                }
+            }
+            P = P->next;
+            if (P != NULL) {
                 printf(",");
             }
         }
