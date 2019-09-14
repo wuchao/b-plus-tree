@@ -48,7 +48,8 @@ extern BPlusTree b_init() {
 static BPlusTree find_left_most(BPlusTree P) {
     BPlusTree left = P;
 
-    while (left != NULL && (left = left->children[0]) != NULL) {
+    while (left != NULL && (left->children[0]) != NULL) {
+        left = left->children[0];
     }
 
     return left;
@@ -62,7 +63,8 @@ static BPlusTree find_left_most(BPlusTree P) {
 static BPlusTree find_right_most(BPlusTree P) {
     BPlusTree right = P;
 
-    while (right != NULL && (right = right->children[right->keyNum - 1]) != NULL) {
+    while (right != NULL && (right->children[right->keyNum - 1]) != NULL) {
+        right = right->children[right->keyNum - 1];
     }
 
     return right;
@@ -79,6 +81,7 @@ static BPlusTree find_available_sibling(BPlusTree Parent, int i) {
     BPlusTree sibling = NULL;
     int Limit = M;
 
+    /* 在 Parent->children 中找（i + 1 或 i - 1）位置上是否有子节点未满 */
     if (i == 0) {
         if (Parent->children[1]->keyNum < Limit) {
             sibling = Parent->children[1];
@@ -259,7 +262,7 @@ static BPlusTree move_element(BPlusTree Src, BPlusTree Dest, BPlusTree Parent, i
     if (SrcInFront) { // 节点 Src 在 Dest 前面
 
         if (Src->children[0] != NULL) {
-
+            /* Src 有子节点，把最后一个子节点从 Src 中移除，再插入 Dest 中 */
             while (j < n) {
                 Child = Src->children[Src->keyNum - 1];
                 remove_element(0, Src, Child, Src->keyNum - 1, UNAVAILABLE);
@@ -268,10 +271,11 @@ static BPlusTree move_element(BPlusTree Src, BPlusTree Dest, BPlusTree Parent, i
             }
 
         } else {
-
+            /* Src 是叶子节点， */
             while (j < n) {
                 TmpKey = Src->keys[Src->keyNum - 1];
                 remove_element(1, Parent, Src, i, Src->keyNum - 1);
+                // Dest 在 Parent 的位置是（i + 1），TmpKey 在 Dest-> keys 中的位置是 0（Src->keys 中的关键字都比 Dest->keys 中的关键字小）
                 insert_element(1, Parent, Dest, TmpKey, i + 1, 0);
                 j++;
             }
@@ -329,14 +333,17 @@ static BPlusTree split_node(BPlusTree Parent, BPlusTree X, int i) {
 
     /* 节点拆分过程 */
     while (j < Limit) {
+        /* 迁移 children */
         if (X->children[0] != NULL) {
             newNode->children[k] = X->children[j];
             X->children[j] = NULL;
         }
 
+        /* 迁移 keys */
         newNode->keys[k] = X->keys[j];
         X->keys[j] = UNAVAILABLE;
 
+        /* 设置 keyNum */
         newNode->keyNum++;
         X->keyNum--;
 
@@ -392,6 +399,7 @@ static BPlusTree merge_node(BPlusTree Parent, BPlusTree X, BPlusTree S, int i) {
 static BPlusTree insert_recursively(BPlusTree T, KeyType key, int i, BPlusTree Parent) {
     int j = 0, Limit = M;
 
+    /* 循环查找 key 应插入到 T->keys 的位置 */
     while (j < T->keyNum && key >= T->keys[j]) {
         /* 重复值不插入 */
         if (key == T->keys[j]) {
@@ -400,6 +408,7 @@ static BPlusTree insert_recursively(BPlusTree T, KeyType key, int i, BPlusTree P
         j++;
     }
 
+    /* j 不等于 0，并且 T 不是叶子节点时，key 应插入（j - 1）子树内 */
     if (j != 0 && T->children[0] != NULL) {
         j--;
     }
@@ -410,19 +419,19 @@ static BPlusTree insert_recursively(BPlusTree T, KeyType key, int i, BPlusTree P
         T->children[j] = insert_recursively(T->children[j], key, j, T);
     }
 
-    /* 调整节点 */
+    /* 当节点 T 由于插入了一个元素导致此节点的 T->keyNum 的值大于 M，需要调整此节点 */
     if (T->keyNum > Limit) {
 
         if (Parent == NULL) {
-            /* 分裂节点 */
+            // 分裂节点
             T = split_node(Parent, T, i);
         } else {
             BPlusTree Sibling = find_available_sibling(Parent, i);
             if (Sibling != NULL) {
-                /* 将 T 的一个元素（key 或者 children）移动到 Sibling 中 */
+                // 将 T 的 1 个元素移动到 Sibling 中，Sibling 可能在 T 前，也可能在 T 后
                 move_element(T, Sibling, Parent, i, 1);
             } else {
-                /* 分裂节点 */
+                // 分裂节点
                 T = split_node(Parent, T, i);
             }
         }
@@ -611,4 +620,30 @@ extern void b_travel_data(BPlusTree T) {
         }
         Tmp = Tmp->next;
     }
+}
+
+/**
+ * 根据关键字查找关键字所在叶子节点
+ * @param T
+ * @param key
+ * @return
+ */
+extern BPlusTree b_find(BPlusTree T, KeyType key) {
+    if (T->children[0] == NULL) {
+        BPlusTree tmp = NULL;
+        for (int i = 0; i < T->keyNum; ++i) {
+            if (T->keys[i] == key) {
+                tmp = T;
+                break;
+            }
+        }
+        return tmp;
+    } else {
+        for (int i = T->keyNum - 1; i >= 0; ++i) {
+            if (key >= T->keys[i]) {
+                return b_find(T->children[i], key);
+            }
+        }
+    }
+    return NULL;
 }

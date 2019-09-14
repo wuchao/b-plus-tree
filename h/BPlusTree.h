@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <limits.h>
 
-#define M (4)
+#define M (3)
 #define LIMIT_M_2 (M % 2 ? (M + 1)/2 : M/2)
 
 typedef int KeyType;
@@ -39,5 +39,8 @@ extern void b_travel(BPlusTree T);
 
 /* 遍历树叶节点的数据 */
 extern void b_travel_data(BPlusTree T);
+
+/* 查找指定 key 所在叶子节点 */
+extern BPlusTree b_find(BPlusTree T, KeyType key);
 
 #endif //B_PLUS_TREE_BPLUSTREE_H
