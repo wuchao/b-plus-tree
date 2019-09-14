@@ -354,6 +354,7 @@ static BPlusTree split_node(BPlusTree Parent, BPlusTree X, int i) {
     if (Parent != NULL) {
         // 将分裂出来的节点放到父节点下（插入节点时，key 的值和 key 要插入的位置无用）
         insert_element(0, Parent, newNode, UNAVAILABLE, i + 1, UNAVAILABLE);
+        return X;
     } else {
         /* 如果 X 原来是根，那么拆分后要创建新的根，并将拆分后的两个节点都放到新的根下 */
         Parent = b_malloc_node();
@@ -363,8 +364,6 @@ static BPlusTree split_node(BPlusTree Parent, BPlusTree X, int i) {
 
         return Parent;
     }
-
-    return X;
 }
 
 /* 合并节点，X 少于 M/2 关键字，S 有大于或等于 M/2 个关键字 */
@@ -439,6 +438,7 @@ static BPlusTree insert_recursively(BPlusTree T, KeyType key, int i, BPlusTree P
     }
 
     if (Parent != NULL) {
+        // 更新父节点中新插入节点的信息
         Parent->keys[i] = T->keys[0];
     }
 
