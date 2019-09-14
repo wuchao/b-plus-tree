@@ -181,33 +181,45 @@ static BPlusTree insert_element(int isKey, BPlusTree Parent, BPlusTree X, KeyTyp
     return X;
 }
 
+/**
+ * 删除节点
+ * @param isKey
+ * @param Parent
+ * @param X
+ * @param i
+ * @param j
+ * @return
+ */
 static BPlusTree remove_element(int isKey, BPlusTree Parent, BPlusTree X, int i, int j) {
 
     int k, Limit;
 
     if (isKey) {
+        /* 删除 key */
+
         Limit = X->keyNum;
-        /* 删除key */
         k = j + 1;
+
         while (k < Limit) {
             X->keys[k - 1] = X->keys[k];
             k++;
         }
 
         X->keys[X->keyNum - 1] = UNAVAILABLE;
-
         Parent->keys[i] = X->keys[0];
-
         X->keyNum--;
+
     } else {
         /* 删除节点 */
 
-        /* 修改树叶节点的链接 */
+        /* 修改树叶节点之间的链接 */
         if (X->children[0] == NULL && i > 0) {
             Parent->children[i - 1]->next = Parent->children[i + 1];
         }
+
         Limit = Parent->keyNum;
         k = i + 1;
+
         while (k < Limit) {
             Parent->children[k - 1] = Parent->children[k];
             Parent->keys[k - 1] = Parent->keys[k];
@@ -220,68 +232,84 @@ static BPlusTree remove_element(int isKey, BPlusTree Parent, BPlusTree X, int i,
         Parent->keyNum--;
 
     }
+
     return X;
 }
 
-/* Src和Dst是两个相邻的节点，i是Src在Parent中的位置；
- 将Src的元素移动到Dst中 ,n是移动元素的个数*/
-static BPlusTree move_element(BPlusTree Src, BPlusTree Dst, BPlusTree Parent, int i, int n) {
+/**
+ * Src 和 Dest 是两个相邻的节点，i 是 Src 在 Parent 中的位置；将 Src 的元素移动到 Dest 中，n 是移动元素的个数
+ * @param Src 
+ * @param Dest 
+ * @param Parent 
+ * @param i 
+ * @param n 
+ * @return 
+ */
+static BPlusTree move_element(BPlusTree Src, BPlusTree Dest, BPlusTree Parent, int i, int n) {
     KeyType TmpKey;
     BPlusTree Child;
-    int j, SrcInFront;
+    int j = 0;
+    // src 是否排在 Dest 前面
+    int SrcInFront = 0;
 
-    SrcInFront = 0;
-
-    if (Src->keys[0] < Dst->keys[0])
+    if (Src->keys[0] < Dest->keys[0]) {
         SrcInFront = 1;
+    }
 
-    j = 0;
-    /* 节点Src在Dst前面 */
-    if (SrcInFront) {
+    if (SrcInFront) { // 节点 Src 在 Dest 前面
+
         if (Src->children[0] != NULL) {
+
             while (j < n) {
                 Child = Src->children[Src->keyNum - 1];
                 remove_element(0, Src, Child, Src->keyNum - 1, UNAVAILABLE);
-                insert_element(0, Dst, Child, UNAVAILABLE, 0, UNAVAILABLE);
+                insert_element(0, Dest, Child, UNAVAILABLE, 0, UNAVAILABLE);
                 j++;
             }
+
         } else {
+
             while (j < n) {
                 TmpKey = Src->keys[Src->keyNum - 1];
                 remove_element(1, Parent, Src, i, Src->keyNum - 1);
-                insert_element(1, Parent, Dst, TmpKey, i + 1, 0);
+                insert_element(1, Parent, Dest, TmpKey, i + 1, 0);
                 j++;
             }
 
         }
 
-        Parent->keys[i + 1] = Dst->keys[0];
-        /* 将树叶节点重新连接 */
-        if (Src->keyNum > 0)
-            find_right_most(Src)->next = find_left_most(Dst);
+        Parent->keys[i + 1] = Dest->keys[0];
+        /* 将树叶节点重新链接 */
+        if (Src->keyNum > 0) {
+            find_right_most(Src)->next = find_left_most(Dest);
+        }
 
-    } else {
+    } else { // 节点 Src 在 Dest 后面
+
         if (Src->children[0] != NULL) {
+
             while (j < n) {
                 Child = Src->children[0];
                 remove_element(0, Src, Child, 0, UNAVAILABLE);
-                insert_element(0, Dst, Child, UNAVAILABLE, Dst->keyNum, UNAVAILABLE);
+                insert_element(0, Dest, Child, UNAVAILABLE, Dest->keyNum, UNAVAILABLE);
                 j++;
             }
 
         } else {
+
             while (j < n) {
                 TmpKey = Src->keys[0];
                 remove_element(1, Parent, Src, i, 0);
-                insert_element(1, Parent, Dst, TmpKey, i - 1, Dst->keyNum);
+                insert_element(1, Parent, Dest, TmpKey, i - 1, Dest->keyNum);
                 j++;
             }
 
         }
 
         Parent->keys[i] = Src->keys[0];
-        if (Src->keyNum > 0)
-            find_right_most(Dst)->next = find_left_most(Src);
+        if (Src->keyNum > 0) {
+            find_right_most(Dest)->next = find_left_most(Src);
+        }
 
     }
 
@@ -420,26 +448,25 @@ extern BPlusTree b_insert(BPlusTree T, KeyType key) {
 
 static BPlusTree remove_recursively(BPlusTree T, KeyType Key, int i, BPlusTree Parent) {
 
-    int j, NeedAdjust;
-    BPlusTree Sibling, Tmp;
-
-    Sibling = NULL;
+    int j = 0, NeedAdjust;
+    BPlusTree Sibling = NULL, Tmp;
 
     /* 查找分支 */
-    j = 0;
     while (j < T->keyNum && Key >= T->keys[j]) {
-        if (Key == T->keys[j])
+        if (Key == T->keys[j]) {
             break;
+        }
         j++;
     }
 
     if (T->children[0] == NULL) {
         /* 没找到 */
-        if (Key != T->keys[j] || j == T->keyNum)
+        if (Key != T->keys[j] || j == T->keyNum) {
             return T;
-    } else if (j == T->keyNum || Key < T->keys[j]) j--;
-
-
+        }
+    } else if (j == T->keyNum || Key < T->keys[j]) {
+        j--;
+    }
 
     /* 树叶 */
     if (T->children[0] == NULL) {
@@ -449,20 +476,25 @@ static BPlusTree remove_recursively(BPlusTree T, KeyType Key, int i, BPlusTree P
     }
 
     NeedAdjust = 0;
-    /* 树的根或者是一片树叶，或者其儿子数在2到M之间 */
-    if (Parent == NULL && T->children[0] != NULL && T->keyNum < 2)
+    if (Parent == NULL && T->children[0] != NULL && T->keyNum < 2) {
+        /* 树的根或者是一片树叶，或者其儿子数在 2 到 M 之间 */
+
         NeedAdjust = 1;
-        /* 除根外，所有非树叶节点的儿子数在[M/2]到M之间。(符号[]表示向上取整) */
-    else if (Parent != NULL && T->children[0] != NULL && T->keyNum < LIMIT_M_2)
+    } else if (Parent != NULL && T->children[0] != NULL && T->keyNum < LIMIT_M_2) {
+        /* 除根外，所有非树叶节点的儿子数在 [M/2] 到 M 之间。(符号[]表示向上取整) */
+
         NeedAdjust = 1;
-        /* （非根）树叶中关键字的个数也在[M/2]和M之间 */
-    else if (Parent != NULL && T->children[0] == NULL && T->keyNum < LIMIT_M_2)
+    } else if (Parent != NULL && T->children[0] == NULL && T->keyNum < LIMIT_M_2) {
+        /* （非根）树叶中关键字的个数也在 [M/2] 和 M 之间 */
+
         NeedAdjust = 1;
+    }
 
     /* 调整节点 */
     if (NeedAdjust) {
         /* 根 */
         if (Parent == NULL) {
+
             if (T->children[0] != NULL && T->keyNum < 2) {
                 Tmp = T;
                 T = T->children[0];
@@ -471,23 +503,25 @@ static BPlusTree remove_recursively(BPlusTree T, KeyType Key, int i, BPlusTree P
             }
 
         } else {
-            /* 查找兄弟节点，其关键字数目大于M/2 */
+
+            /* 查找兄弟节点，其关键字数目大于 M/2 */
             Sibling = find_sibling_key_num_greater_than_M_2(Parent, i, &j);
             if (Sibling != NULL) {
                 move_element(Sibling, T, Parent, j, 1);
             } else {
-                if (i == 0)
+                if (i == 0) {
                     Sibling = Parent->children[1];
-                else
+                } else {
                     Sibling = Parent->children[i - 1];
+                }
 
                 Parent = merge_node(Parent, T, Sibling, i);
                 T = Parent->children[i];
             }
+
         }
 
     }
-
 
     return T;
 }
@@ -499,18 +533,21 @@ extern BPlusTree b_remove(BPlusTree T, KeyType Key) {
 
 /* 销毁 */
 extern BPlusTree b_destroy(BPlusTree T) {
-    int i, j;
     if (T != NULL) {
-        i = 0;
+        int i = 0, j = 0;
+
         while (i < T->keyNum + 1) {
             b_destroy(T->children[i]);
             i++;
         }
 
         printf("Destroy:(");
-        j = 0;
-        while (j < T->keyNum)/*  T->keys[i] != UNAVAILABLE*/
+
+        /* T->keys[i] != UNAVAILABLE*/
+        while (j < T->keyNum) {
             printf("%d:", T->keys[j++]);
+        }
+
         printf(") ");
         free(T);
         T = NULL;
@@ -519,26 +556,33 @@ extern BPlusTree b_destroy(BPlusTree T) {
     return T;
 }
 
+/**
+ * 递归遍历
+ * @param T
+ * @param Level  树的层级（打印时从 0 开始）
+ */
 static void travel_recursively(BPlusTree T, int Level) {
-    int i;
     if (T != NULL) {
+        int i = 0;
+
         printf("  ");
         printf("[Level:%d]-->", Level);
         printf("(");
-        i = 0;
-        while (i < T->keyNum)/*  T->keys[i] != UNAVAILABLE*/
+
+        /* T->keys[i] != UNAVAILABLE */
+        while (i < T->keyNum) {
             printf("%d:", T->keys[i++]);
+        }
         printf(")");
 
         Level++;
-
         i = 0;
+
+        /* 递归遍历子树 */
         while (i <= T->keyNum) {
             travel_recursively(T->children[i], Level);
             i++;
         }
-
-
     }
 }
 
@@ -550,19 +594,21 @@ extern void b_travel(BPlusTree T) {
 
 /* 遍历树叶节点的数据 */
 extern void b_travel_data(BPlusTree T) {
-    BPlusTree Tmp;
-    int i;
-    if (T == NULL)
+    if (T == NULL) {
         return;
+    }
     printf("All Data:");
-    Tmp = T;
-    while (Tmp->children[0] != NULL)
+    BPlusTree Tmp = T;
+    int i;
+    while (Tmp->children[0] != NULL) {
         Tmp = Tmp->children[0];
+    }
     /* 第一片树叶 */
     while (Tmp != NULL) {
         i = 0;
-        while (i < Tmp->keyNum)
+        while (i < Tmp->keyNum) {
             printf(" %d", Tmp->keys[i++]);
+        }
         Tmp = Tmp->next;
     }
 }
